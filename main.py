@@ -62,13 +62,12 @@ def process_data(path):
     return X_train, X_test, y_train, y_test, X, y
     X_2_train, X_2_test, y_2_train, y_2_test = train_test_split(X_2, y_2, test_size = 0.20, random_state = 0)
 
-# Forest stuff
+# Random Forest Classifier
 def random_forest_classifier(dataset):
-    # process_data(dataset)
     clf = RandomForestClassifier(max_depth = 2, random_state = 0)
     clf.fit(dataset[4], dataset[5])
 
-    forest_pred = clf.predict(dataset[3])
+    forest_pred = clf.predict(dataset[1])
     acc_score = accuracy_score(dataset[3], forest_pred)
 
     print("Accuracy with Random Forest Classifier: ", acc_score)
@@ -85,24 +84,39 @@ def random_forest_classifier(dataset):
 
 # Feature Scaling
 
+#return X_train, X_test, y_train, y_test, X, y
+
 def gaussian_NB_classifier(dataset):
 
     stand_sclr = StandardScaler()
-    dataset.X_train = stand_sclr.fit_transform(dataset.X_train)
-    dataset.X_test = stand_sclr.transform(dataset.X_test)
+
+    x_train = stand_sclr.fit_transform(dataset[0])
+    x_test = stand_sclr.transform(dataset[1])
+    # dataset.X_train = stand_sclr.fit_transform(dataset.X_train)
+    # dataset.X_test = stand_sclr.transform(dataset.X_test)
 
     # Training the Naive Bayes model on the Training set
     classifier = GaussianNB()
-    classifier.fit(dataset.X_train, dataset.y_train)
-    y_pred = classifier.predict(dataset.X_test)
+    classifier.fit(x_train, dataset[2])
+    y_pred = classifier.predict(x_test)
 
-    acc_score = accuracy_score(dataset.y_test, y_pred)
-    print("Accuracy with Random Forest Classifier: ", acc_score)
+    acc_score = accuracy_score(dataset[3], y_pred)
+    print("Accuracy with Naive Bayes Classifier: ", acc_score)
     return y_pred
 
-
+print("\n********************************************* ")
+print("Prediction with unmodified dataset: ")
+print("********************************************* \n")
 data = process_data(dataset_path)
+data_v2 = process_data(dataset_v2_path)
 random_forest_classifier(data)
+gaussian_NB_classifier(data)
+
+print("\n\n********************************************* ")
+print("Prediction with modified dataset (dataset_v2) ")
+print("********************************************* ")
+random_forest_classifier(data_v2)
+gaussian_NB_classifier(data_v2)
 # Predicting the Test set results
 
 # due days, sum, terms, age, education, gender
