@@ -29,7 +29,6 @@ dataset_v2_path = "./data/dataset_v2.csv"
 
 @return tuple = (X_train, X_test, y_train, y_test, X, y)
 """
-
 def process_data(path):
     dataset = pd.read_csv(path)
 
@@ -153,5 +152,3 @@ print("********************************************* ")
 
 random_forest_classifier(data_v2, new_loan)
 gaussian_NB_classifier(data_v2, new_loan)
-
-
