@@ -23,6 +23,13 @@ Popa Vlad
 dataset_path = "./data/dataset.csv"
 dataset_v2_path = "./data/dataset_v2.csv"
 
+"""
+@brief          Reads data from dataset, processes it and creates training- and testsets
+@param path     Path to dataset (.csv file)
+
+@return tuple = (X_train, X_test, y_train, y_test, X, y)
+"""
+
 def process_data(path):
     dataset = pd.read_csv(path)
 
@@ -47,7 +54,13 @@ def process_data(path):
 
     return X_train, X_test, y_train, y_test, X, y
 
-# Random Forest Classifier
+"""
+@brief                  Random Forest Classifier to predict loan eligibility
+@param dataset          Data returned from process_data() function
+@param new_loan         New entry of data in [[Due days, sum, terms, age, education, gender]] format
+
+@return forest_pred     Predicts if loan will be paid back or not [0, 1, 'COLLECTION', 'COLLECTION_PAIDOFF', 'PAIDOFF']
+"""
 def random_forest_classifier(dataset, new_loan):
     clf = RandomForestClassifier(max_depth = 2, random_state = 0)
     clf.fit(dataset[4], dataset[5])
@@ -71,7 +84,14 @@ def random_forest_classifier(dataset, new_loan):
 
     return forest_pred
 
-# Naive Bayes classifier
+
+"""
+@brief             Gaussian Naive Bayes to predict loan eligibility
+@param dataset     Data returned from process_data() function
+@param new_loan    New entry of data in [[Due days, sum, terms, age, education, gender]] format
+
+@return y_pred     Predicts if loan will be paid back or not [0, 1, 'COLLECTION', 'COLLECTION_PAIDOFF', 'PAIDOFF']
+"""
 def gaussian_NB_classifier(dataset, new_loan):
     stand_sclr = StandardScaler()
     x_train = stand_sclr.fit_transform(dataset[0])
@@ -104,9 +124,11 @@ gaussian_NB_classifier(data, 0)
 print("\n\n********************************************* ")
 print("Prediction with modified dataset (dataset_v2) ")
 print("********************************************* ")
+
 random_forest_classifier(data_v2, 0)
 gaussian_NB_classifier(data_v2, 0)
 
+# Create new_loan object
 # Due days, sum, terms, age, education, gender
 new_loan = [[0, 1000, 30, 28, 1, 0]]
 
@@ -120,15 +142,15 @@ print(new_loan)
 print("\n********************************************* ")
 print("Prediction with unmodified dataset: ")
 print("********************************************* ")
+
 data = process_data(dataset_path)
-# data_v2 = process_data(dataset_v2_path)
-# random_forest_classifier(data, new_loan)
 gaussian_NB_classifier(data, new_loan)
 random_forest_classifier(data, new_loan)
 
 print("\n\n********************************************* ")
 print("Prediction with modified dataset (dataset_v2) ")
 print("********************************************* ")
+
 random_forest_classifier(data_v2, new_loan)
 gaussian_NB_classifier(data_v2, new_loan)
 
