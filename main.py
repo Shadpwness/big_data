@@ -110,45 +110,48 @@ def gaussian_NB_classifier(dataset, new_loan):
         
     return y_pred
 
+def main():
+    print("\n********************************************* ")
+    print("Prediction with unmodified dataset: ")
+    print("********************************************* ")
 
-print("\n********************************************* ")
-print("Prediction with unmodified dataset: ")
-print("********************************************* ")
+    data = process_data(dataset_path)
+    data_v2 = process_data(dataset_v2_path)
+    random_forest_classifier(data, 0)
+    gaussian_NB_classifier(data, 0)
 
-data = process_data(dataset_path)
-data_v2 = process_data(dataset_v2_path)
-random_forest_classifier(data, 0)
-gaussian_NB_classifier(data, 0)
+    print("\n\n********************************************* ")
+    print("Prediction with modified dataset (dataset_v2) ")
+    print("********************************************* ")
 
-print("\n\n********************************************* ")
-print("Prediction with modified dataset (dataset_v2) ")
-print("********************************************* ")
+    random_forest_classifier(data_v2, 0)
+    gaussian_NB_classifier(data_v2, 0)
 
-random_forest_classifier(data_v2, 0)
-gaussian_NB_classifier(data_v2, 0)
+    # Create new_loan object
+    # Due days, sum, terms, age, education, gender
+    new_loan = [[0, 1000, 30, 28, 1, 0]]
 
-# Create new_loan object
-# Due days, sum, terms, age, education, gender
-new_loan = [[0, 1000, 30, 28, 1, 0]]
+    print("\n\n\n\n\n********************************************* ")
+    print("Prediction for new loan eligibility: ")
+    print("********************************************* ")
 
-print("\n\n\n\n\n********************************************* ")
-print("Prediction for new loan eligibility: ")
-print("********************************************* ")
+    print("[[Due days, sum, terms, age, education, gender]]")
+    print(new_loan)
 
-print("[[Due days, sum, terms, age, education, gender]]")
-print(new_loan)
+    print("\n********************************************* ")
+    print("Prediction with unmodified dataset: ")
+    print("********************************************* ")
 
-print("\n********************************************* ")
-print("Prediction with unmodified dataset: ")
-print("********************************************* ")
+    data = process_data(dataset_path)
+    gaussian_NB_classifier(data, new_loan)
+    random_forest_classifier(data, new_loan)
 
-data = process_data(dataset_path)
-gaussian_NB_classifier(data, new_loan)
-random_forest_classifier(data, new_loan)
+    print("\n\n********************************************* ")
+    print("Prediction with modified dataset (dataset_v2) ")
+    print("********************************************* ")
 
-print("\n\n********************************************* ")
-print("Prediction with modified dataset (dataset_v2) ")
-print("********************************************* ")
+    random_forest_classifier(data_v2, new_loan)
+    gaussian_NB_classifier(data_v2, new_loan)
 
-random_forest_classifier(data_v2, new_loan)
-gaussian_NB_classifier(data_v2, new_loan)
+if __name__ == "__main__":
+    main()
