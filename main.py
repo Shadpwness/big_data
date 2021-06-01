@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
+from scipy.sparse import data
 from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
@@ -70,10 +71,10 @@ def random_forest_classifier(dataset, new_loan):
         print("Accuracy with Random Forest Classifier: ", acc_score)
 
         # Plot Predictions and Values axis
-        plt.scatter(dataset[3], forest_pred)
-        plt.ylabel("Predictions")
-        plt.xlabel("Values")
-        plt.show()
+        # plt.scatter(dataset[3], forest_pred)
+        # plt.ylabel("Predictions")
+        # plt.xlabel("Values")
+        # plt.show()
 
     else:
         forest_pred = clf.predict(new_loan)
@@ -108,6 +109,86 @@ def gaussian_NB_classifier(dataset, new_loan):
         print("[NAIVE BAYES] Prediction of new loan - client able to pay: ")
         print(y_pred)
         
+    return y_pred
+
+def column(matrix, i):
+    return [row[i] for row in matrix]
+
+"""
+@brief             Linear Regression
+@param dataset     Data returned from process_data() function
+@param new_loan    New entry of data in [[Due days, sum, terms, age, education, gender]] format
+
+@return y_pred     Chance of debt to be paid back in time
+"""
+def linear_regression(dataset, new_loan):
+    from sklearn.linear_model import LinearRegression
+    
+    print("Using Linear Regression: ")
+    # We'll assign some weights to each
+    ## PAIDOFF - 1
+    ## UNPAID / COLLECTION - 0
+    ## COLLECTION_PAIDOFF - 0.5 (late payment)
+    y = dataset[2]
+    y = np.where(y == 'PAIDOFF', 1, y)
+    y = np.where(y == 'UNPAID', 0, y)
+    y = np.where(y == 'COLLECTION_PAIDOFF', 0.5, y)
+    y = np.where(y == 'COLLECTION', 0, y)
+
+    # Train dataset
+    reg = LinearRegression().fit(dataset[0], y)
+    # Accuracy score
+    print("Accuracy score = ", reg.score(dataset[0], y))
+
+    # Coefficients describe which relationships are more/less significant
+    print("Coefficients = ", reg.coef_)
+
+    # Intercept indicates the location where the slope intersects an axis
+    print("Intercept = ", reg.intercept_)
+
+    y_pred = reg.predict(dataset[1])
+
+    x_test = dataset[1]
+    y_test = dataset[3]
+
+    # We'll assign some weights to each
+    ## PAIDOFF - 1
+    ## UNPAID / COLLECTION - 0
+    ## COLLECTION_PAIDOFF - 0.5 (late payment)
+    y_test = np.where(y_test == 'PAIDOFF', 1, y_test)
+    y_test = np.where(y_test == 'UNPAID', 0, y_test)
+    y_test = np.where(y_test == 'COLLECTION_PAIDOFF', 0.5, y_test)
+    y_test = np.where(y_test == 'COLLECTION', 0, y_test)
+
+    y = dataset[5]
+
+    days = column(x_test, 0)
+    days_array = np.array(days, dtype='float')
+    y_test_array = np.array(y_test, dtype='float')
+    y_pred_array = np.array(y_pred, dtype='float')
+
+    # Plotting points, labels
+    plt.title("Probability of paying back by days")
+    plt.xlabel("Pays in time")
+    plt.ylabel("Probability of paying back")
+    plt.plot(days, y_pred, 'o', color='blue')
+    plt.plot(days, y_test_array, 'o', color='red')
+
+    # "Decision" line
+    plt.axline((0,0), (0,1.1), linestyle='--')
+
+    # Best fit line
+    ## Where:
+    ## m = slope
+    ## b = intercept
+    m , b = np.polyfit(days_array, y_pred_array, 1)
+    plt.plot(days_array, m * days_array + b)
+    plt.show()
+
+    if (new_loan != 0):
+        y_pred = reg.predict(new_loan)
+        print("Prediction for new loan = %.2f" % (y_pred[0] * 100), "% chance of paying back")
+
     return y_pred
 
 def main():
@@ -152,6 +233,13 @@ def main():
 
     random_forest_classifier(data_v2, new_loan)
     gaussian_NB_classifier(data_v2, new_loan)
+
+
+    print("\n\n********************************************* ")
+    print("Prediction using Linear Regression: ")
+    print("********************************************* ")
+    # linear_regression(data, 0)
+    linear_regression(data, new_loan)
 
 if __name__ == "__main__":
     main()
