@@ -1,3 +1,4 @@
+import matplotlib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -9,15 +10,20 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.tree import export_text
+from sklearn import tree
+
 warnings.filterwarnings("ignore")
 
 """
 
-Loan eligibility predicter
+@title          Loan eligibility predicter
 
-Boda Levente
-Kovács Géza
-Popa Vlad
+@authors        Boda Levente
+                Kovács Géza
+                Popa Vlad
 
 """
 
@@ -75,7 +81,6 @@ def random_forest_classifier(dataset, new_loan):
         # plt.ylabel("Predictions")
         # plt.xlabel("Values")
         # plt.show()
-
     else:
         forest_pred = clf.predict(new_loan)
         
@@ -83,7 +88,6 @@ def random_forest_classifier(dataset, new_loan):
         print(forest_pred)
 
     return forest_pred
-
 
 """
 @brief             Gaussian Naive Bayes to predict loan eligibility
@@ -168,6 +172,8 @@ def linear_regression(dataset, new_loan):
     y_pred_array = np.array(y_pred, dtype='float')
 
     # Plotting points, labels
+    fig = plt.figure()
+    fig.canvas.set_window_title("Linear Regression")
     plt.title("Probability of paying back by days")
     plt.xlabel("Pays in time")
     plt.ylabel("Probability of paying back")
@@ -190,6 +196,37 @@ def linear_regression(dataset, new_loan):
         print("Prediction for new loan = %.2f" % (y_pred[0] * 100), "% chance of paying back")
 
     return y_pred
+
+"""
+@brief             Decision Tree with Classifier
+@param data        Data returned from process_data() function
+"""
+def decision_tree_classifier(data):
+    fig = plt.figure(figsize = [16, 10], dpi = 115)
+    plt.title("Decision Tree with Classifier")
+    fig.canvas.set_window_title("Decision Tree with Classifier")
+    decision_tree = tree.DecisionTreeClassifier()
+    decision_tree = decision_tree.fit(data[4], data[5])
+    tree.plot_tree(decision_tree)
+    plt.show()
+
+"""
+@brief             Decision Tree with Regressor
+@param data        Data returned from process_data() function
+"""
+def decision_tree_regressor(data):
+    fig = plt.figure(figsize = [16, 10], dpi = 115)
+    plt.title("Decision Tree with Regressor")
+    decision_tree = tree.DecisionTreeRegressor()
+    fig.canvas.set_window_title("Decision Tree with Regressor")
+    y = data[5]
+    y = np.where(y == 'PAIDOFF', 1, y)
+    y = np.where(y == 'UNPAID', 0, y)
+    y = np.where(y == 'COLLECTION_PAIDOFF', 0.5, y)
+    y = np.where(y == 'COLLECTION', 0, y)
+    decision_tree = decision_tree.fit(data[4], y)
+    tree.plot_tree(decision_tree)
+    plt.show()
 
 def main():
     print("\n********************************************* ")
@@ -234,12 +271,17 @@ def main():
     random_forest_classifier(data_v2, new_loan)
     gaussian_NB_classifier(data_v2, new_loan)
 
-
     print("\n\n********************************************* ")
     print("Prediction using Linear Regression: ")
     print("********************************************* ")
     # linear_regression(data, 0)
     linear_regression(data, new_loan)
+
+    # Decision tree with Classifier
+    decision_tree_classifier(data)
+
+    # Decision tree with Regressor
+    decision_tree_regressor(data)
 
 if __name__ == "__main__":
     main()
