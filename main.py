@@ -68,7 +68,7 @@ def process_data(path):
 @return forest_pred     Predicts if loan will be paid back or not [0, 1, 'COLLECTION', 'COLLECTION_PAIDOFF', 'PAIDOFF']
 """
 def random_forest_classifier(dataset, new_loan):
-    clf = RandomForestClassifier(max_depth = 2, random_state = 0)
+    clf = RandomForestClassifier(random_state = 0)
     X = dataset[4]
     y = dataset[5]
     X_test = dataset[1]
@@ -121,6 +121,13 @@ def gaussian_NB_classifier(dataset, new_loan):
         
     return y_pred
 
+"""
+@brief             Return i-th column of a matrix
+@param matrix      Matrix we'd like to get the i-th column of
+@param i           Index of the column we'd like to return
+
+@return row[i]     i-th column of the matrix
+"""
 def column(matrix, i):
     return [row[i] for row in matrix]
 
@@ -139,16 +146,20 @@ def linear_regression(dataset, new_loan):
     ## PAIDOFF - 1
     ## UNPAID / COLLECTION - 0
     ## COLLECTION_PAIDOFF - 0.5 (late payment)
-    y = dataset[2]
-    y = np.where(y == 'PAIDOFF', 1, y)
-    y = np.where(y == 'UNPAID', 0, y)
-    y = np.where(y == 'COLLECTION_PAIDOFF', 0.5, y)
-    y = np.where(y == 'COLLECTION', 0, y)
+    x_train = dataset[0]
+    x_test  = dataset[1]
+    y_train = dataset[2]
+    y_test  = dataset[3]
+    y       = dataset[5]
+    y_train = np.where(y_train == 'PAIDOFF', 1, y_train)
+    y_train = np.where(y_train == 'UNPAID', 0, y_train)
+    y_train = np.where(y_train == 'COLLECTION_PAIDOFF', 0.5, y_train)
+    y_train = np.where(y_train == 'COLLECTION', 0, y_train)
 
     # Train dataset
-    reg = LinearRegression().fit(dataset[0], y)
+    reg = LinearRegression().fit(x_train, y_train)
     # Accuracy score
-    print("Accuracy score = ", reg.score(dataset[0], y))
+    print("Accuracy score = ", reg.score(x_train, y_train))
 
     # Coefficients describe which relationships are more/less significant
     print("Coefficients = ", reg.coef_)
@@ -156,10 +167,7 @@ def linear_regression(dataset, new_loan):
     # Intercept indicates the location where the slope intersects an axis
     print("Intercept = ", reg.intercept_)
 
-    y_pred = reg.predict(dataset[1])
-
-    x_test = dataset[1]
-    y_test = dataset[3]
+    y_pred = reg.predict(x_test)
 
     # We'll assign some weights to each
     ## PAIDOFF - 1
@@ -169,8 +177,6 @@ def linear_regression(dataset, new_loan):
     y_test = np.where(y_test == 'UNPAID', 0, y_test)
     y_test = np.where(y_test == 'COLLECTION_PAIDOFF', 0.5, y_test)
     y_test = np.where(y_test == 'COLLECTION', 0, y_test)
-
-    y = dataset[5]
 
     days = column(x_test, 0)
     days_array = np.array(days, dtype='float')
@@ -209,11 +215,13 @@ def linear_regression(dataset, new_loan):
 @param data        Data returned from process_data() function
 """
 def decision_tree_classifier(data):
+    X = data[4]
+    y = data[5]
     fig = plt.figure(figsize = [16, 10], dpi = 115)
     plt.title("Decision Tree with Classifier")
     fig.canvas.set_window_title("Decision Tree with Classifier")
     decision_tree = tree.DecisionTreeClassifier()
-    decision_tree = decision_tree.fit(data[4], data[5])
+    decision_tree = decision_tree.fit(X, y)
     tree.plot_tree(decision_tree)
     plt.show()
 
@@ -226,12 +234,13 @@ def decision_tree_regressor(data):
     plt.title("Decision Tree with Regressor")
     decision_tree = tree.DecisionTreeRegressor()
     fig.canvas.set_window_title("Decision Tree with Regressor")
+    X = data[4]
     y = data[5]
     y = np.where(y == 'PAIDOFF', 1, y)
     y = np.where(y == 'UNPAID', 0, y)
     y = np.where(y == 'COLLECTION_PAIDOFF', 0.5, y)
     y = np.where(y == 'COLLECTION', 0, y)
-    decision_tree = decision_tree.fit(data[4], y)
+    decision_tree = decision_tree.fit(X, y)
     tree.plot_tree(decision_tree)
     plt.show()
 
