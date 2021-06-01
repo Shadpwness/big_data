@@ -69,11 +69,15 @@ def process_data(path):
 """
 def random_forest_classifier(dataset, new_loan):
     clf = RandomForestClassifier(max_depth = 2, random_state = 0)
-    clf.fit(dataset[4], dataset[5])
+    X = dataset[4]
+    y = dataset[5]
+    X_test = dataset[1]
+    y_test = dataset[3]
+    clf.fit(X, y)
 
     if(new_loan == 0):
-        forest_pred = clf.predict(dataset[1])
-        acc_score = accuracy_score(dataset[3], forest_pred)
+        forest_pred = clf.predict(X_test)
+        acc_score = accuracy_score(y_test, forest_pred)
         print("Accuracy with Random Forest Classifier: ", acc_score)
 
         # Plot Predictions and Values axis
@@ -99,13 +103,15 @@ def random_forest_classifier(dataset, new_loan):
 def gaussian_NB_classifier(dataset, new_loan):
     stand_sclr = StandardScaler()
     x_train = stand_sclr.fit_transform(dataset[0])
+    y_train = dataset[2]
+    y_test  = dataset[3]
     classifier = GaussianNB()
-    classifier.fit(x_train, dataset[2])
+    classifier.fit(x_train, y_train)
 
     if(new_loan == 0):  
         x_test = stand_sclr.transform(dataset[1])
         y_pred = classifier.predict(x_test)
-        acc_score = accuracy_score(dataset[3], y_pred)
+        acc_score = accuracy_score(y_test, y_pred)
         print("Accuracy with Naive Bayes Classifier: ", acc_score)
         
     else:
@@ -191,6 +197,7 @@ def linear_regression(dataset, new_loan):
     plt.plot(days_array, m * days_array + b)
     plt.show()
 
+    # Print probability of new loanee to pay back in time
     if (new_loan != 0):
         y_pred = reg.predict(new_loan)
         print("Prediction for new loan = %.2f" % (y_pred[0] * 100), "% chance of paying back")
