@@ -1,9 +1,11 @@
 import matplotlib
 import numpy as np
+from numpy.core.multiarray import datetime_as_string
 import pandas as pd
 import matplotlib.pyplot as plt
 import warnings
 from scipy.sparse import data
+from sklearn import linear_model
 from sklearn.metrics import accuracy_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler
@@ -12,9 +14,12 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LogisticRegression
 from sklearn.tree import export_text
 from sklearn import tree
-
+from sklearn import metrics
+from scipy.special import expit
 warnings.filterwarnings("ignore")
 
 """
@@ -139,8 +144,6 @@ def column(matrix, i):
 @return y_pred     Chance of debt to be paid back in time
 """
 def linear_regression(dataset, new_loan):
-    from sklearn.linear_model import LinearRegression
-    
     print("Using Linear Regression: ")
     # We'll assign some weights to each
     ## PAIDOFF - 1
@@ -244,6 +247,26 @@ def decision_tree_regressor(data):
     tree.plot_tree(decision_tree)
     plt.show()
 
+def logistic_regression(dataset, new_loan):
+    X = dataset[4]
+    y = dataset[5]
+    X_train = dataset[0]
+    X_test = dataset[1]
+    y_test = dataset[3]
+
+    clf = LogisticRegression(random_state = 0).fit(X, y)
+    prob_estimates = clf.predict_proba(X_train)
+    predictions = clf.predict(X_test)
+    confusion_matrix = metrics.confusion_matrix(y_test, predictions)
+
+    score = clf.score(X, y)
+    if (new_loan != 0):
+        print("[Logistic Regression] New loan prediction = ", clf.predict(new_loan))
+    print("[Logistic Regression] Accuracy score = ", score)
+    print("[Logistic Regression] Probability Estimates = \n", prob_estimates)
+    print("[Logistic Regression] Confusion Matrix = \n", confusion_matrix)
+
+
 def main():
     print("\n********************************************* ")
     print("Prediction with unmodified dataset: ")
@@ -276,7 +299,6 @@ def main():
     print("Prediction with unmodified dataset: ")
     print("********************************************* ")
 
-    data = process_data(dataset_path)
     gaussian_NB_classifier(data, new_loan)
     random_forest_classifier(data, new_loan)
 
@@ -290,6 +312,7 @@ def main():
     print("\n\n********************************************* ")
     print("Prediction using Linear Regression: ")
     print("********************************************* ")
+    
     # linear_regression(data, 0)
     linear_regression(data, new_loan)
 
@@ -298,6 +321,9 @@ def main():
 
     # Decision tree with Regressor
     decision_tree_regressor(data)
+
+    # Prediction with logistic regression
+    logistic_regression(data, new_loan)
 
 if __name__ == "__main__":
     main()
