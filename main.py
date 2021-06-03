@@ -217,7 +217,7 @@ def linear_regression(dataset, new_loan):
 @brief             Decision Tree with Classifier (simplified for plot)
 """
 def decision_tree_simplified():
-    df = pd.read_csv(dataset_path);
+    df = pd.read_csv(dataset_path)
     d = { 'PAIDOFF': 1, 'COLLECTION_PAIDOFF': 0, 'COLLECTION': 0 }
     df['loan_status'] = df['loan_status'].map(d)
     d = { 'High School or Below': 0, 'BSc': 1, 'Master or Above': 2 }
@@ -226,8 +226,8 @@ def decision_tree_simplified():
     df['Gender'] = df['Gender'].map(d)
 
     features = ['education', 'Loan', 'Gender']
-    X = df[features];
-    y = df['loan_status'];
+    X = df[features]
+    y = df['loan_status']
 
     dtree = DecisionTreeClassifier()
     dtree = dtree.fit(X, y)
@@ -243,7 +243,7 @@ def decision_tree_simplified():
 @brief             Decision Tree with Classifier (all data for prediction)
 """
 def decision_tree_all_data():
-    df = pd.read_csv(dataset_path);
+    df = pd.read_csv(dataset_path)
     d = { 'PAIDOFF': 1, 'COLLECTION_PAIDOFF': 0, 'COLLECTION': 0 }
     df['loan_status'] = df['loan_status'].map(d)
     d = { 'High School or Below': 0, 'BSc': 1, 'Master or Above': 2 }
@@ -252,8 +252,8 @@ def decision_tree_all_data():
     df['Gender'] = df['Gender'].map(d)
 
     features = ['paid_in_advance', 'age', 'education', 'Gender', 'Loan']
-    X = df[features];
-    y = df['loan_status'];
+    X = df[features]
+    y = df['loan_status']
 
     dtree = DecisionTreeClassifier()
     dtree = dtree.fit(X, y)
@@ -284,6 +284,11 @@ def decision_tree_regressor(data):
     tree.plot_tree(decision_tree)
     plt.show()
 
+"""
+@brief             Logistic Regression Classifier
+@param dataset     Data returned from process_data() function
+@param new_loan    New person created for loan prediction
+"""
 def logistic_regression(dataset, new_loan):
     X = dataset[4]
     y = dataset[5]
