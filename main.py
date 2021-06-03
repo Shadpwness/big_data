@@ -211,19 +211,56 @@ def linear_regression(dataset, new_loan):
     return y_pred
 
 """
-@brief             Decision Tree with Classifier
-@param data        Data returned from process_data() function
+@brief             Decision Tree with Classifier (simplified for plot)
 """
-def decision_tree_classifier(data):
-    X = data[4]
-    y = data[5]
+def decision_tree_simplified():
+    df = pd.read_csv(dataset_path);
+    d = { 'PAIDOFF': 1, 'COLLECTION_PAIDOFF': 0, 'COLLECTION': 0 }
+    df['loan_status'] = df['loan_status'].map(d)
+    d = { 'High School or Below': 0, 'BSc': 1, 'Master or Above': 2 }
+    df['education'] = df['education'].map(d)
+    d = { 'male': 0, 'female': 1 }
+    df['Gender'] = df['Gender'].map(d)
+
+    features = ['education', 'Loan', 'Gender']
+    X = df[features];
+    y = df['loan_status'];
+
+    dtree = DecisionTreeClassifier()
+    dtree = dtree.fit(X, y)
+
     fig = plt.figure(figsize = [16, 10], dpi = 115)
     plt.title("Decision Tree with Classifier")
     fig.canvas.set_window_title("Decision Tree with Classifier")
-    decision_tree = tree.DecisionTreeClassifier()
-    decision_tree = decision_tree.fit(X, y)
-    tree.plot_tree(decision_tree)
+
+    tree.plot_tree(dtree)
     plt.show()
+    
+"""
+@brief             Decision Tree with Classifier (all data for prediction)
+"""
+def decision_tree_all_data():
+    df = pd.read_csv(dataset_path);
+    d = { 'PAIDOFF': 1, 'COLLECTION_PAIDOFF': 0, 'COLLECTION': 0 }
+    df['loan_status'] = df['loan_status'].map(d)
+    d = { 'High School or Below': 0, 'BSc': 1, 'Master or Above': 2 }
+    df['education'] = df['education'].map(d)
+    d = { 'male': 0, 'female': 1 }
+    df['Gender'] = df['Gender'].map(d)
+
+    features = ['paid_in_advance', 'age', 'education', 'Gender', 'Loan']
+    X = df[features];
+    y = df['loan_status'];
+
+    dtree = DecisionTreeClassifier()
+    dtree = dtree.fit(X, y)
+
+    print("[DECISION TREE CLASSIFIER] Prediction of new loan - client able to pay: ")
+    prediction = dtree.predict([[-5, 50, 0, 0, 5000]])
+    if (prediction[0] == 0):
+        print('NO')
+    else:
+        print('YES')
 
 """
 @brief             Decision Tree with Regressor
@@ -293,8 +330,14 @@ def main():
     # linear_regression(data, 0)
     linear_regression(data, new_loan)
 
-    # Decision tree with Classifier
-    decision_tree_classifier(data)
+    print("\n********************************************* ")
+    print("Prediction with decision tree with Classifier: ")
+    print("********************************************* ")
+    # Decision tree with Classifier (simplified)
+    decision_tree_simplified()
+
+    # Decision tree with Classifier (all data)
+    decision_tree_all_data()
 
     # Decision tree with Regressor
     decision_tree_regressor(data)
